@@ -1,5 +1,6 @@
 blockline_setup() {
     autoload -Uz colors && colors
+    autoload -U add-zsh-hook
 
     setopt prompt_subst
     setopt prompt_percent
@@ -48,6 +49,70 @@ blockline_solarized_colors() {
     TEXT_COLOR="$SOL_FG[base3]"
 }
 
+blockline_python_venv() {
+    local readonly symbol_python='ƨ'
+}
+
+blockline_vcs_info() {
+    local branch="⑂"
+    local merging="m"
+
+    local staged="+"
+    local modified="!"
+    local untracked="."
+
+    local ahead="⇡ NUM"
+    local behind="⇣ NUM"
+
+
+    ! git rev-parse --is-inside-work-tree > /dev/null 2>&1 && return
+
+
+    local git_location=${$(git symbolic-ref -q HEAD || git name-rev --name-only --no-undefined --always HEAD)#(refs/heads/|tags/)}
+
+
+    local -a divergencies
+
+    local num_ahead="$(git log --oneline @{u}.. 2>/dev/null | wc -l | tr -d ' ')"
+    if [ "$num_ahed" -gt 0 ]; then
+        divergencies+=("${ahead//NUM/$num_ahead}")
+    fi
+
+    local num_behind="$(git log --oneline ..@{u} 2>/dev/null | wc -l | tr -d ' ')"
+    if [ "$num_behind" -gt 0 ]; then
+        divergencies+=("${behind//NUM/$num_behind}")
+    fi
+
+
+    local -a flags
+
+    local git_dir="$(git rev-parse --git-dir 2> /dev/null)"
+    if [ -n $git_dir ] && test -r $git_dir/MERGE_HEAD; then
+        flags+=("$merging")
+    fi
+
+    if [[ -n $(git ls-files --other --exclude-standard 2> /dev/null) ]]; then
+        flags+=("$untracked")
+    fi
+
+    if ! git diff --quiet 2> /dev/null; then
+        flags+=("$modified")
+    fi
+
+    if ! git diff --cached --quiet 2> /dev/null; then
+        flags+=("$staged")
+    fi
+
+
+
+    local -a git_info
+    git_info+=("$branch $git_location")
+    [[ ${#flags[@]} -ne 0 ]] && git_info+=("${(j::)flags}")
+    [[ ${#divergencies[@]} -ne 0 ]] && git_info+=("${(j::)divergencies}")
+
+    echo "$SOL_BG[blue] ${(j: :)git_info} $RESET_BG"
+}
+
 blockline() {
     blockline_setup
     blockline_solarized_colors
@@ -57,6 +122,9 @@ blockline() {
     # prompt directory
     block_prompt+="$SOL_BG[base1] %3~ $RESET_BG"
 
+    # version control info
+    block_prompt+="$(blockline_vcs_info)"
+
     # prompt char
     local symbol_color="%(?.$SOL_BG[green].$SOL_BG[red])"
     block_prompt+="$symbol_color $ $RESET_BG"
@@ -64,4 +132,4 @@ blockline() {
     PROMPT="$TEXT_COLOR${block_prompt} $RESET_FG"
 }
 
-blockline
+add-zsh-hook precmd blockline
