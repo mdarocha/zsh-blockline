@@ -74,7 +74,7 @@ blockline_vcs_info() {
     local -a divergencies
 
     local num_ahead="$(git log --oneline @{u}.. 2>/dev/null | wc -l | tr -d ' ')"
-    if [ "$num_ahed" -gt 0 ]; then
+    if [ "$num_ahead" -gt 0 ]; then
         divergencies+=("${ahead//NUM/$num_ahead}")
     fi
 
