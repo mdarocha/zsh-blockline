@@ -57,7 +57,7 @@ blockline_python_venv() {
 
 blockline_ssh() {
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-        echo "$SOL_BG[violet] ssh $RESET_BG"
+        echo "$SOL_BG[violet] $(cat /etc/hostname) $RESET_BG"
     fi
 }
 
