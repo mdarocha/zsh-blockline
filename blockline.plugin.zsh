@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 blockline_setup() {
     autoload -Uz colors && colors
     autoload -U add-zsh-hook
@@ -51,6 +53,12 @@ blockline_solarized_colors() {
 
 blockline_python_venv() {
     local readonly symbol_python='ƨ'
+}
+
+blockline_ssh() {
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        echo "$SOL_BG[violet] ssh $RESET_BG"
+    fi
 }
 
 blockline_vcs_info() {
@@ -118,6 +126,9 @@ blockline() {
     blockline_solarized_colors
 
     local block_prompt=""
+
+    # ssh info
+    block_prompt+="$(blockline_ssh)"
 
     # prompt directory
     block_prompt+="$SOL_BG[base1] %3~ $RESET_BG"
