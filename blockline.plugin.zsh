@@ -53,6 +53,9 @@ blockline_solarized_colors() {
 
 blockline_python_venv() {
     local readonly symbol_python='ƨ'
+    if [ -n "$VIRTUAL_ENV" ]; then
+        echo "$SOL_BG[violet] ${symbol_python} $(basename ${VIRTUAL_ENV}) $RESET_BG"
+    fi
 }
 
 blockline_ssh() {
@@ -136,6 +139,9 @@ blockline() {
 
     # ssh info
     block_prompt+="$(blockline_ssh)"
+
+    # python env info
+    block_prompt+="$(blockline_python_venv)"
 
     # prompt directory
     block_prompt+="$SOL_BG[base1] %3~ $RESET_BG"
