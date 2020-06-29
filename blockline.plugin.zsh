@@ -61,6 +61,13 @@ blockline_ssh() {
     fi
 }
 
+blockline_jobs() {
+    local jobs_count=$(jobs | wc -l)
+    if [ $jobs_count -ne 0 ]; then
+        echo "$SOL_BG[yellow] $jobs_count $RESET_BG"
+    fi
+}
+
 blockline_vcs_info() {
     local branch="⑂"
     local merging="m"
@@ -132,6 +139,9 @@ blockline() {
 
     # prompt directory
     block_prompt+="$SOL_BG[base1] %3~ $RESET_BG"
+
+    # jobs count
+    block_prompt+="$(blockline_jobs)"
 
     # version control info
     block_prompt+="$(blockline_vcs_info)"
