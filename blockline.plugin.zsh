@@ -65,7 +65,7 @@ blockline_ssh() {
 }
 
 blockline_jobs() {
-    local jobs_count=$(jobs | wc -l)
+    local jobs_count=$(jobs | grep running | wc -l)
     if [ $jobs_count -ne 0 ]; then
         echo "$SOL_BG[yellow] $jobs_count $RESET_BG"
     fi
